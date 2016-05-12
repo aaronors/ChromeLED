@@ -1,8 +1,10 @@
 package com.decoder.led.chromeled;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -79,14 +81,18 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
+        android.app.FragmentManager fragmentMangager = getFragmentManager();
 
-        if (id == R.id.nav_camera) {
+        if (id == R.id.nav_detect) {
             // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        } else if (id == R.id.nav_errorLog) {
 
-        } else if (id == R.id.nav_slideshow) {
+        } else if (id == R.id.nav_tutorial) {
+            fragmentMangager.beginTransaction()
+                    .replace(R.id.content_main, new FirstFragment())
+                    .commit();
 
-        } else if (id == R.id.nav_manage) {
+        } else if (id == R.id.nav_contactUs) {
 
         } else if (id == R.id.nav_share) {
 
@@ -97,5 +103,9 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+    public void switchTutorial(View view) {
+        Intent myIntent = new Intent (MainActivity.this, TutorialActivity.class);
+        MainActivity.this.startActivity(myIntent);
     }
 }
