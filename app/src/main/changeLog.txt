@@ -1,0 +1,8 @@
+//This file is just a log of detailed changes not covered by git messages
+
+May 15th, 2016, 8:40pm
+=================
+- Started changeLog and toDolist
+- imported prototyped image processing (DetectActivity) and results page with current version of ChromeLED
+- added temporary fullscreenactivity for testing and troubleshooting
+- App can currently run

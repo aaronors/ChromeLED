@@ -1,0 +1,5 @@
+=== To Do List ====
+- Apply Navigation Drawer to Results page or convert results activity to fragment
+- remove redundancies in decoding stage (Restults.java) and incorporate Team 1 message scheme
+- Adjust app design and layouts
+- robustify light detection

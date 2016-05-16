@@ -84,6 +84,9 @@ public class MainActivity extends AppCompatActivity
         android.app.FragmentManager fragmentMangager = getFragmentManager();
 
         if (id == R.id.nav_detect) {
+            fragmentMangager.beginTransaction()
+                    .replace(R.id.content_main, new beginDetectFragment())
+                    .commit();
             // Handle the camera action
         } else if (id == R.id.nav_errorLog) {
 
@@ -103,6 +106,10 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+    public void startDetect(View view) {
+        Intent myintent = new Intent (MainActivity.this, DetectActivity.class);
+        MainActivity.this.startActivity(myintent);
     }
     public void switchTutorial(View view) {
         Intent myIntent = new Intent (MainActivity.this, TutorialActivity.class);
