@@ -11,9 +11,9 @@
             android:icon="@drawable/ic_menu_gallery"
             android:title="Error Log" />
         <item
-            android:id="@+id/nav_tutorial"
+            android:id="@+id/nav_help"
             android:icon="@drawable/ic_menu_slideshow"
-            android:title="Tutorial" />
+            android:title="Help" />
         <item
             android:id="@+id/nav_contactUs"
             android:icon="@drawable/ic_menu_manage"

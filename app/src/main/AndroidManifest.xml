@@ -28,10 +28,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".TutorialActivity"
-            android:label="@string/title_activity_tutorial"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
             android:name=".FullscreenActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_fullscreen"

@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -85,17 +84,23 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_detect) {
             fragmentMangager.beginTransaction()
-                    .replace(R.id.content_main, new beginDetectFragment())
+                    .replace(R.id.content_main, new DetectFragment())
                     .commit();
             // Handle the camera action
         } else if (id == R.id.nav_errorLog) {
-
-        } else if (id == R.id.nav_tutorial) {
             fragmentMangager.beginTransaction()
-                    .replace(R.id.content_main, new FirstFragment())
+                    .replace(R.id.content_main, new ErrorLogFragment())
+                    .commit();
+
+        } else if (id == R.id.nav_help) {
+            fragmentMangager.beginTransaction()
+                    .replace(R.id.content_main, new HelpFragment())
                     .commit();
 
         } else if (id == R.id.nav_contactUs) {
+            fragmentMangager.beginTransaction()
+                    .replace(R.id.content_main, new ContactUsFragment())
+                    .commit();
 
         }
 
@@ -107,8 +112,8 @@ public class MainActivity extends AppCompatActivity
         Intent myintent = new Intent (MainActivity.this, DetectActivity.class);
         MainActivity.this.startActivity(myintent);
     }
-    public void switchTutorial(View view) {
-        Intent myIntent = new Intent (MainActivity.this, TutorialActivity.class);
-        MainActivity.this.startActivity(myIntent);
+
+    public void setActionBarTitle(String title) {
+        getSupportActionBar().setTitle(title);
     }
 }

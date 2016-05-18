@@ -10,14 +10,15 @@ import android.view.ViewGroup;
 /**
  * Created by Jason on 5/11/2016.
  */
-public class FirstFragment extends Fragment {
+public class HelpFragment extends Fragment {
 
     View myView;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        myView = inflater.inflate(R.layout.first_layout, container, false);
+        myView = inflater.inflate(R.layout.help_layout, container, false);
+        ((MainActivity) getActivity()).setActionBarTitle("Help");
         return myView;
     }
 }
