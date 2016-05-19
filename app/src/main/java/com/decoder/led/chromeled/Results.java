@@ -110,7 +110,7 @@ public class Results extends AppCompatActivity {
                 //for int array
                 //buffer = Integer.toString(bitString[i]) + Integer.toString(bitString[i + 1]) + Integer.toString(bitString[i + 2]) + Integer.toString(bitString[i + 3]);
 
-                //code to convert hex to ascii
+                //code to convert hex to ascii ( might not actually be used because of code below)
                 //buffer2 =  bitString.substring(i+4, i+8);
                 //hexTodecimal += key.get(buffer);
                 //hexTodecimal += key.get(buffer2);
@@ -125,14 +125,32 @@ public class Results extends AppCompatActivity {
                 //decMsg contains Hex
             }
         }
-        outMsg = decMsg;
+        //without ascii conversion ( prints decMsg )
+        //outMsg = decMsg;
+
         //convert decMsg to ASCII
-        /*while(j < decMsg.length()){
-            decimal = Integer.parseInt(decMsg.substring(j, j+2), 16);
-            outMsg += ((char) decimal);
+        while(j < decMsg.length()){
+            //check for escape char 0xDB
+            if(decMsg.substring(j,j+2) == "DB") {
+                j+=2;
+                if(decMsg.substring(j+2, j+4) == "50")
+                    outMsg += "C0";
+                else if(decMsg.substring(j+2, j+4) == "51")
+                    outMsg += "AA";
+                else if(decMsg.substring(j+2, j+4) == "52")
+                    outMsg += "DB";
+                else
+                    outMsg += "??";
+            }
+            else
+                outMsg += decMsg.substring(j,j+2);
+
+            //covert 1 byte into ascii
+            //decimal = Integer.parseInt(decMsg.substring(j, j+2), 16);
+            //outMsg += ((char) decimal);
             j+=2;
         }
-        */
+
         return outMsg;
         //add error handling
     }
