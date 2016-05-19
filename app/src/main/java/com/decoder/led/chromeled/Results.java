@@ -11,6 +11,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 
 public class Results extends AppCompatActivity {
     private static final String TAG = "ResultsPage";
@@ -42,24 +44,33 @@ public class Results extends AppCompatActivity {
         //bundle setup, refer between results activity and tutorial1activity
         Bundle extras = getIntent().getExtras();
         int[] receivedData = extras.getIntArray("Array");
+        //int[]
+        String signalValues = extras.getString("signalIn");
         TextView tv = (TextView)findViewById(R.id.textView_activity_results);
+        TextView tv2 = (TextView)findViewById(R.id.bugInfo);
         String bitS = extras.getString("bitString");
         //tv.setText(extras.getString("Message"));
-        String out = "message: " + msgDecode(bitS, key);
+        String debugOut = "Signal length: " + signalValues.length() + '\n' + "Some bytes: ";
+        debugOut += signalValues.substring(0, 64);
+        //int[] signalBinary = valuetoBinary(signalValues);
+
+        String out = "Message in Hex: " + msgDecode(signalValues, key);
         //String out = msgDecode(receivedData, key);
+        tv2.setText(debugOut);
         tv.setText(out);
 
-        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });*/
+
     }
+
+    /*public int[] valuetoBinary(int[] signalValues){
+        int[] signalBinary;
+
+        return signalBinary;
+    }
+    */
+
     public String msgDecode(String bitString, HashMap<String, String> key ){
-        //do computation
+        //start here
         String output = "We processed!";
         String buffer = null;
         String buffer2 = null;
@@ -68,31 +79,60 @@ public class Results extends AppCompatActivity {
         int decimal = 0;
         String decMsg = "";
         int j = 0;
+        int modLength = 0;
+        int bitLength = bitString.length();
 
-        if(bitString.length() < 256) {
-            Log.i(TAG, "short input , is " + bitString.length()+ " end");
-            return "Short input";
+        //value -> binary
+        /*for(int i = 0; i < bitLength; i++){
+            if(bitString[i] > 0)
+                bitString[i] = 1;
+            else
+                bitString[i] = 0;
+            //if 0 or -x, set to zero for whatever reason we get a negative number
+        }*/
+
+        //bitString contains our binary input,
+        //decoding process
+        modLength = bitLength % 4;
+        if(bitLength > 0) {
+            if(bitLength < 4) {
+                Log.i(TAG, "short input , is " + bitString.length() + " end");
+                return "Short input";
+                //will bitString.length be same as bitLength? during our process
+            }
+            else
+            //add a input.length mod 4 and create while loop w/ end condition as input.length - remainder cutting off last bits
+            //add checker to see if high or low, if value exist then yes
+            //for i -> 256, take subarry of bitString of size 4 and pull from hex table.
+
+
+            for (int i = 0; i < (bitLength - modLength); i += 4) {
+                //for int array
+                //buffer = Integer.toString(bitString[i]) + Integer.toString(bitString[i + 1]) + Integer.toString(bitString[i + 2]) + Integer.toString(bitString[i + 3]);
+
+                //code to convert hex to ascii
+                //buffer2 =  bitString.substring(i+4, i+8);
+                //hexTodecimal += key.get(buffer);
+                //hexTodecimal += key.get(buffer2);
+                //decMsg += key.get(buffer); //replace with buffer when working
+                //decMsg += key.get(buffer2);
+                //decimal = Integer.parseInt(hexTodecimal, 16);
+
+                //** Code for String of bits input **
+                //decMsg contains a string of hex characters from byte
+                buffer = bitString.substring(i, i+4);
+                decMsg += key.get(buffer);
+                //decMsg contains Hex
+            }
         }
-        else
-            Log.i(TAG, "were past a short input " + bitString.substring(0,4)+ " end");
-        //for i -> 256, take subarry of bitString of size 4 and pull from hex table.
-        //commented code refers to use of an int[]
-        for(int i = 0; i <256; i+=4){
-            //buffer = Integer.toString(bitString[i])+ Integer.toString(bitString[i+1]) + Integer.toString(bitString[i+2]) + Integer.toString(bitString[i+3]);
-            buffer = bitString.substring(i, i+4);
-            //buffer2 =  bitString.substring(i+4, i+8);
-            //hexTodecimal += key.get(buffer);
-            //hexTodecimal += key.get(buffer2);
-            //decMsg += key.get(buffer); //replace with buffer when working
-            //decMsg += key.get(buffer2);
-            //decimal = Integer.parseInt(hexTodecimal, 16);
-            decMsg += key.get(buffer);
-        }
-        while(j < decMsg.length()){
+        outMsg = decMsg;
+        //convert decMsg to ASCII
+        /*while(j < decMsg.length()){
             decimal = Integer.parseInt(decMsg.substring(j, j+2), 16);
             outMsg += ((char) decimal);
             j+=2;
         }
+        */
         return outMsg;
         //add error handling
     }

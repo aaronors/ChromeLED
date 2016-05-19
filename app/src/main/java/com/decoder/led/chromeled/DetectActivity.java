@@ -55,6 +55,11 @@ public class DetectActivity extends Activity implements CvCameraViewListener2 {
     Point rectPoint2;
     Mat subImage;
     Mat mask;
+    Timer timer; // assigned in oncreate, used to perform processing every 100ms
+    boolean process = false; // flag that enables processing; set true by timer, set false after processing done
+    int signalIndex = 0; // start index at 0, used to iterate through signal[]
+    String signal = ""; // array of signal values, allocated to 1024 in oncreate
+    //*** PROCESSING VARIABLES DEFINITIONS END ***//
 
     public boolean onCreateOptionsMenu(Menu menu) {
         Log.i(TAG, "called onCreateOptionsMenu");
@@ -65,18 +70,21 @@ public class DetectActivity extends Activity implements CvCameraViewListener2 {
     public boolean onOptionsItemSelected(MenuItem item) {
         Log.i(TAG, "called onOptionsItemSelected; selected item: " + item);
         //intent declaration to switch activities
-        int[] arry = new int[256];
+        int[] arry = {1,1,1,0,0,1,0,0,1,0,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,1,0,0,0,0,1,1,0,1,0,1,1,1,1,
+                0,1,1,1,0,1,0,1,0,1,0,0,1,0,0,0,1,0,1,0,1,0,1,0,0,0,1,0,1,0,1,1,1,0,0,0,0,1,0,1,0,0,0,1,1,0,0,0,1,0,1,0,1,1,0,0,1,0,0,0,0,1,1,1,1,1,1,0,0,1,0,1,0,0,1,1,0,0,0,1,0,0,1,1,0,1,1,1,1,0,0,0,0,1,0,1,1,1,1,1,1,1,1,0,0,0,1,0,0,1,0,1,0,0,1,1,1,1,0,0,1,0,1,1,1,1,0,1,0,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,0,1,0,1,0,0,1,0,1,0,0,0,0,0,1,1,0,1,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0,1,1,0,1,1,1,0,0,1,0,0,0,0,1,0,1,0,0,0,0,0,1,1,1,0,0,0,0,0,1};
+
         double rand = Math.random();
         String randoLondo = "";
         int x;
 
+        //temporary string of binary
         randoLondo = "0100100001100101011100100110010100100000011010010111001100100000011000010010000000110011001100100010000001100010011110010111010001100101001000000110110101100101011100110111001101100001011001110110010100100001001000010010000100100001001000010010000100100001";
-        //randoLondo = "1110010010010101010101100100001101011110111010101001000101010100010101110000101000110001010110010000111111001010011000100110111100001011111111000100101001111001011110100111011101110111101011111010100101000001101001111111110000110111001000010100000111000001";
         if (item == mItemResults) {
             Intent myintent = new Intent(DetectActivity.this, Results.class);
             myintent.putExtra("Message", "Results have been passed!");
             myintent.putExtra("Array", arry);
             myintent.putExtra("bitString", randoLondo); //randoLondo is placeholder for input bit string
+            myintent.putExtra("signalIn", signal);
             //startActivity(myintent);
             DetectActivity.this.startActivity(myintent);
         }
@@ -214,9 +222,29 @@ public class DetectActivity extends Activity implements CvCameraViewListener2 {
             Imgproc.drawContours(origImage,contours,-1,CONTOUR_COLOR,7);
 
             Log.i(TAG, "Count = " + contours.size());
+            if(contours.size() > 0)
+                signal += "1";
+            else
+                signal += "0";
+           // signalIndex=signalIndex%1024; // mod by size so that signalIndex wraps around when it reaches 1024
+            //signal[signalIndex] = contours.size(); // for now just store how many contours there were within ROI -- later store number of pixels
+            //signalIndex++;
         }
+        //process = false; // reset flag to false to show that processing has completed
 
         return origImage;
 
     }
+
+  /*  class myTask extends TimerTask {
+        @Override
+        public void run() {
+            if (process)
+                Log.d("TimerTask","Called TimerTask while still trying to process in onCameraFrame. Delay may not be long enough");
+            else
+                process = true;
+            Log.d("TimerTask","Called TimerTask -- global flag process set to " + process);
+        }
+    }
+    */
 }

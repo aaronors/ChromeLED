@@ -1,5 +1,15 @@
 //This file is just a log of detailed changes not covered by git messages
 
+May 18, 2016
+=================
+- switched int[] to String input on results
+- added additional debugging information on results page
+
+May 16th, 2016
+=================
+- added temporary logo
+- changed results from String to int[]
+
 May 15th, 2016, 8:40pm
 =================
 - Started changeLog and toDolist
