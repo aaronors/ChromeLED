@@ -27,8 +27,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SurfaceView;
+import android.view.View;
 import android.view.WindowManager;
 import android.view.MotionEvent;
+import android.widget.Button;
 import android.widget.Toast;
 
 
@@ -59,6 +61,7 @@ public class DetectActivity extends Activity implements CvCameraViewListener2 {
     boolean process = false; // flag that enables processing; set true by timer, set false after processing done
     int signalIndex = 0; // start index at 0, used to iterate through signal[]
     String signal = ""; // array of signal values, allocated to 1024 in oncreate
+    Button processButton;
     //*** PROCESSING VARIABLES DEFINITIONS END ***//
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -70,25 +73,35 @@ public class DetectActivity extends Activity implements CvCameraViewListener2 {
     public boolean onOptionsItemSelected(MenuItem item) {
         Log.i(TAG, "called onOptionsItemSelected; selected item: " + item);
         //intent declaration to switch activities
-        int[] arry = {1,1,1,0,0,1,0,0,1,0,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,1,0,0,0,0,1,1,0,1,0,1,1,1,1,
-                0,1,1,1,0,1,0,1,0,1,0,0,1,0,0,0,1,0,1,0,1,0,1,0,0,0,1,0,1,0,1,1,1,0,0,0,0,1,0,1,0,0,0,1,1,0,0,0,1,0,1,0,1,1,0,0,1,0,0,0,0,1,1,1,1,1,1,0,0,1,0,1,0,0,1,1,0,0,0,1,0,0,1,1,0,1,1,1,1,0,0,0,0,1,0,1,1,1,1,1,1,1,1,0,0,0,1,0,0,1,0,1,0,0,1,1,1,1,0,0,1,0,1,1,1,1,0,1,0,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,0,1,0,1,0,0,1,0,1,0,0,0,0,0,1,1,0,1,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0,1,1,0,1,1,1,0,0,1,0,0,0,0,1,0,1,0,0,0,0,0,1,1,1,0,0,0,0,0,1};
-
-        double rand = Math.random();
-        String randoLondo = "";
-        int x;
+        //int[] arry = {1,1,1,0,0,1,0,0,1,0,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,1,0,0,0,0,1,1,0,1,0,1,1,1,1,
+          //      0,1,1,1,0,1,0,1,0,1,0,0,1,0,0,0,1,0,1,0,1,0,1,0,0,0,1,0,1,0,1,1,1,0,0,0,0,1,0,1,0,0,0,1,1,0,0,0,1,0,1,0,1,1,0,0,1,0,0,0,0,1,1,1,1,1,1,0,0,1,0,1,0,0,1,1,0,0,0,1,0,0,1,1,0,1,1,1,1,0,0,0,0,1,0,1,1,1,1,1,1,1,1,0,0,0,1,0,0,1,0,1,0,0,1,1,1,1,0,0,1,0,1,1,1,1,0,1,0,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,0,1,0,1,0,0,1,0,1,0,0,0,0,0,1,1,0,1,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0,1,1,0,1,1,1,0,0,1,0,0,0,0,1,0,1,0,0,0,0,0,1,1,1,0,0,0,0,0,1};
 
         //temporary string of binary
-        randoLondo = "0100100001100101011100100110010100100000011010010111001100100000011000010010000000110011001100100010000001100010011110010111010001100101001000000110110101100101011100110111001101100001011001110110010100100001001000010010000100100001001000010010000100100001";
+        //String randoLondo = "0100100001100101011100100110010100100000011010010111001100100000011000010010000000110011001100100010000001100010011110010111010001100101001000000110110101100101011100110111001101100001011001110110010100100001001000010010000100100001001000010010000100100001";
         if (item == mItemResults) {
             Intent myintent = new Intent(DetectActivity.this, Results.class);
             myintent.putExtra("Message", "Results have been passed!");
-            myintent.putExtra("Array", arry);
-            myintent.putExtra("bitString", randoLondo); //randoLondo is placeholder for input bit string
+            //myintent.putExtra("Array", arry);
+            //myintent.putExtra("bitString", randoLondo); //randoLondo is placeholder for input bit string
             myintent.putExtra("signalIn", signal);
             //startActivity(myintent);
             DetectActivity.this.startActivity(myintent);
         }
         return true;
+    }
+
+    public void switchResults(View view){
+        Intent myintent = new Intent(DetectActivity.this, Results.class);
+        //String randoLondo = "0100100001100101011100100110010100100000011010010111001100100000011000010010000000110011001100100010000001100010011110010111010001100101001000000110110101100101011100110111001101100001011001110110010100100001001000010010000100100001001000010010000100100001";
+        //int[] arry = {1,1,1,0,0,1,0,0,1,0,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,1,0,0,0,0,1,1,0,1,0,1,1,1,1,
+        //        0,1,1,1,0,1,0,1,0,1,0,0,1,0,0,0,1,0,1,0,1,0,1,0,0,0,1,0,1,0,1,1,1,0,0,0,0,1,0,1,0,0,0,1,1,0,0,0,1,0,1,0,1,1,0,0,1,0,0,0,0,1,1,1,1,1,1,0,0,1,0,1,0,0,1,1,0,0,0,1,0,0,1,1,0,1,1,1,1,0,0,0,0,1,0,1,1,1,1,1,1,1,1,0,0,0,1,0,0,1,0,1,0,0,1,1,1,1,0,0,1,0,1,1,1,1,0,1,0,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,0,1,0,1,0,0,1,0,1,0,0,0,0,0,1,1,0,1,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0,1,1,0,1,1,1,0,0,1,0,0,0,0,1,0,1,0,0,0,0,0,1,1,1,0,0,0,0,0,1};
+
+        //myintent.putExtra("Message", "Results have been passed!");
+        //myintent.putExtra("Array", arry);
+        //myintent.putExtra("bitString", randoLondo); //randoLondo is placeholder for input bit string
+        myintent.putExtra("signalIn", signal);
+        //startActivity(myintent);
+        DetectActivity.this.startActivity(myintent);
     }
 
     //*** PROCESSING VARIABLES DEFINITIONS END ***//
@@ -126,6 +139,8 @@ public class DetectActivity extends Activity implements CvCameraViewListener2 {
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
 
         mOpenCvCameraView.setCvCameraViewListener(this);
+        processButton = (Button)findViewById(R.id.process_button);
+     //   processButton.setVisibility(View.GONE);
     }
 
     @Override
@@ -187,6 +202,7 @@ public class DetectActivity extends Activity implements CvCameraViewListener2 {
         COUNT=0;
         myImage = inputFrame.rgba();
         Mat origImage = inputFrame.rgba();
+        //boolean show = false;
 
         /*** MOVING THESE OUT OF THIS FUNCTION CAUSES SEGFAULT ***/
         Scalar CONTOUR_COLOR = new Scalar(0,255,0);
@@ -226,6 +242,15 @@ public class DetectActivity extends Activity implements CvCameraViewListener2 {
                 signal += "1";
             else
                 signal += "0";
+            Log.i(TAG, "Signal Length: " + signal.length());
+            //show process button when long enough
+            /*if(show == false) {
+                if (signal.length() >= 32) {
+                    show = true;
+                    processButton.setVisibility(View.VISIBLE);
+                }
+            }*/
+
            // signalIndex=signalIndex%1024; // mod by size so that signalIndex wraps around when it reaches 1024
             //signal[signalIndex] = contours.size(); // for now just store how many contours there were within ROI -- later store number of pixels
             //signalIndex++;
