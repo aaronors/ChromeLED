@@ -74,7 +74,7 @@ public class DetectActivity extends Activity implements CvCameraViewListener2 {
         Log.i(TAG, "called onOptionsItemSelected; selected item: " + item);
         //intent declaration to switch activities
         //int[] arry = {1,1,1,0,0,1,0,0,1,0,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,1,0,0,0,0,1,1,0,1,0,1,1,1,1,
-          //      0,1,1,1,0,1,0,1,0,1,0,0,1,0,0,0,1,0,1,0,1,0,1,0,0,0,1,0,1,0,1,1,1,0,0,0,0,1,0,1,0,0,0,1,1,0,0,0,1,0,1,0,1,1,0,0,1,0,0,0,0,1,1,1,1,1,1,0,0,1,0,1,0,0,1,1,0,0,0,1,0,0,1,1,0,1,1,1,1,0,0,0,0,1,0,1,1,1,1,1,1,1,1,0,0,0,1,0,0,1,0,1,0,0,1,1,1,1,0,0,1,0,1,1,1,1,0,1,0,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,0,1,0,1,0,0,1,0,1,0,0,0,0,0,1,1,0,1,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0,1,1,0,1,1,1,0,0,1,0,0,0,0,1,0,1,0,0,0,0,0,1,1,1,0,0,0,0,0,1};
+        //      0,1,1,1,0,1,0,1,0,1,0,0,1,0,0,0,1,0,1,0,1,0,1,0,0,0,1,0,1,0,1,1,1,0,0,0,0,1,0,1,0,0,0,1,1,0,0,0,1,0,1,0,1,1,0,0,1,0,0,0,0,1,1,1,1,1,1,0,0,1,0,1,0,0,1,1,0,0,0,1,0,0,1,1,0,1,1,1,1,0,0,0,0,1,0,1,1,1,1,1,1,1,1,0,0,0,1,0,0,1,0,1,0,0,1,1,1,1,0,0,1,0,1,1,1,1,0,1,0,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,0,1,0,1,0,0,1,0,1,0,0,0,0,0,1,1,0,1,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0,1,1,0,1,1,1,0,0,1,0,0,0,0,1,0,1,0,0,0,0,0,1,1,1,0,0,0,0,0,1};
 
         //temporary string of binary
         //String randoLondo = "0100100001100101011100100110010100100000011010010111001100100000011000010010000000110011001100100010000001100010011110010111010001100101001000000110110101100101011100110111001101100001011001110110010100100001001000010010000100100001001000010010000100100001";
@@ -140,7 +140,7 @@ public class DetectActivity extends Activity implements CvCameraViewListener2 {
 
         mOpenCvCameraView.setCvCameraViewListener(this);
         processButton = (Button)findViewById(R.id.process_button);
-     //   processButton.setVisibility(View.GONE);
+        //   processButton.setVisibility(View.GONE);
     }
 
     @Override
@@ -251,7 +251,7 @@ public class DetectActivity extends Activity implements CvCameraViewListener2 {
                 }
             }*/
 
-           // signalIndex=signalIndex%1024; // mod by size so that signalIndex wraps around when it reaches 1024
+            // signalIndex=signalIndex%1024; // mod by size so that signalIndex wraps around when it reaches 1024
             //signal[signalIndex] = contours.size(); // for now just store how many contours there were within ROI -- later store number of pixels
             //signalIndex++;
         }

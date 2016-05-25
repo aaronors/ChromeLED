@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.lang.String;
@@ -90,6 +91,46 @@ public class Results extends AppCompatActivity {
         tv2.setText(debugOut);
         tv.setText(out);
 
+    }//end of on create
+
+    public void saveText(View view){
+        String filename = "savefile";
+        FileOutputStream outputStream;
+        String internalString = out + "\n";
+
+        try{
+            outputStream = openFileOutput(filename, Context.MODE_APPEND);
+            outputStream.write(internalString.getBytes());
+            //outputStream.write("\n")
+            outputStream.close();
+            Toast.makeText(getApplicationContext(), "Message saved", Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+            Toast.makeText(getApplicationContext(), "Message not saved", Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
+    }
+
+    public void loadText(View view){
+        String Message;
+        TextView textView = (TextView)findViewById(R.id.extratextView);
+
+        try{
+        FileInputStream fileInputStream = openFileInput("savefile");
+        InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
+        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+        StringBuffer stringBuffer = new StringBuffer();
+        while ((Message = bufferedReader.readLine()) != null)
+        {
+            stringBuffer.append(Message + "\n");
+        }
+        textView.setText(stringBuffer.toString());
+        textView.setVisibility(View.VISIBLE);
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e){
+            e.printStackTrace();
+        }
     }
 
 
@@ -104,7 +145,7 @@ public class Results extends AppCompatActivity {
         int j = 0;
         int modLength = 0;
         int bitLength = bitString.length();
-
+        int decLength;
         //decoding process
         modLength = bitLength % 4;
         if(bitLength > 0) {
@@ -127,9 +168,14 @@ public class Results extends AppCompatActivity {
         }
         //without ascii conversion ( prints decMsg )
         //outMsg = decMsg;
-
+        decLength = decMsg.length();
         //convert decMsg to ASCII
-        if((decMsg.length() > 4) && ((decMsg.length() % 2) == 0)) {
+        if((decLength % 2) != 0) {
+            //decLength = decLength - 1;
+            decMsg += "P";
+            Toast.makeText(getApplicationContext(), "Odd length, message has been padded", Toast.LENGTH_LONG).show();
+        }
+        if((decLength > 4) && ((decMsg.length() % 2) == 0)) {
             while (j < decMsg.length()) {
                 //check for escape char 0xDB
                 if (decMsg.substring(j, j + 2) == "DB") {
@@ -156,67 +202,6 @@ public class Results extends AppCompatActivity {
         return outMsg;
         //add error handling?
     }
-
-    public void saveMsg(View view) {
-        String toSave = out;
-        //file names
-        //String file_name = "error_log";
-
-
-       /* OutStream is = null;
-        try {
-            is = getResources().getAssets().open("errorLog.txt");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            FileOutputStream fos = openFileOutput(is, MODE_PRIVATE);
-            fos.write(toSave.getBytes());
-            fos.close();
-            Toast.makeText(getApplicationContext(), "Message saved", Toast.LENGTH_LONG).show();
-        } catch (FileNotFoundException e) {
-            Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_LONG).show();
-            e.printStackTrace();
-        }
-        */
-    }
-
-
-       /* try {
-            FileOutputStream fileOutputStream = openFileOutput("errorLog.txt", MODE_PRIVATE);
-            fileOutputStream.write(toSave.getBytes());
-            fileOutputStream.close();
-            Toast.makeText(getApplicationContext(), "Message saved", Toast.LENGTH_LONG).show();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        */
-
-
-    /*public void displayErrors(View view)
-    {
-        TextView temp = (TextView)findViewById(R.id.temp_textView);;
-        try {
-            String Message;
-            FileInputStream fileInputStream = openFileInput("savedMessages.txt");
-            InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-            StringBuffer stringBuffer = new StringBuffer();
-            while ((Message = bufferedReader.readLine()) != null)
-            {
-                stringBuffer.append(Message + "\n");
-            }
-            temp.setText(stringBuffer.toString());
-            //textView.setVisibility(View.VISIBLE);
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e){
-            e.printStackTrace();
-        }
-    }*/
 
 
 }//end of results activity

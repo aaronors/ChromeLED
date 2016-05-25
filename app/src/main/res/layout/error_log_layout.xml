@@ -5,34 +5,27 @@
     tools:context="com.decoder.led.chromeled.ErrorLogFragment">
 
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Errors"
-        android:id="@+id/Log_textView"
-        android:layout_alignTop="@+id/refresh_button"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Clear Log"
         android:id="@+id/clear_button"
+        android:onClick="clearLog"
         android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginRight="25dp"
-        android:layout_marginEnd="25dp"
-        android:layout_marginTop="48dp" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="50dp"
+        android:layout_marginStart="50dp" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Refresh"
         android:id="@+id/refresh_button"
-        android:onClick="displayErrors"
-        android:layout_alignTop="@+id/clear_button"
-        android:layout_centerHorizontal="true" />
+        android:onClick="loadText"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="53dp"
+        android:layout_marginEnd="53dp" />
 </RelativeLayout>

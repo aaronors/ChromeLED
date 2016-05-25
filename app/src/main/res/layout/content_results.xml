@@ -51,6 +51,26 @@
         android:layout_alignTop="@+id/Debug_textView"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:onClick="saveMsg" />
+        android:onClick="saveText" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Extra"
+        android:id="@+id/extratextView"
+        android:layout_below="@+id/textView_activity_results"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="36dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Load"
+        android:id="@+id/loadbutton"
+        android:onClick="loadText"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/save_button"
+        android:layout_toStartOf="@+id/save_button" />
 
 </RelativeLayout>
