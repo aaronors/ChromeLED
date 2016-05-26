@@ -3,12 +3,7 @@ package com.decoder.led.chromeled;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.AssetManager;
 import android.os.Bundle;
-import android.os.Environment;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.os.EnvironmentCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -19,12 +14,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -193,13 +186,13 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_help) {
             fragmentMangager.beginTransaction()
-                    .replace(R.id.content_main, new HelpFragment())
+                    .replace(R.id.content_main, new TutorialFragment())
                     .commit();
             textView.setVisibility(View.GONE);
 
         } else if (id == R.id.nav_contactUs) {
             fragmentMangager.beginTransaction()
-                    .replace(R.id.content_main, new ContactUsFragment())
+                    .replace(R.id.content_main, new HelpFragment())
                     .commit();
 
         }
