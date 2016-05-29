@@ -178,19 +178,19 @@ public class MainActivity extends AppCompatActivity
                     .commit();
             textView.setVisibility(View.GONE);
             // Handle the camera action
-        } else if (id == R.id.nav_errorLog) {
+        } else if (id == R.id.nav_log) {
             fragmentMangager.beginTransaction()
                     .replace(R.id.content_main, new ErrorLogFragment())
                     .commit();
             textView.setVisibility(View.VISIBLE);
 
-        } else if (id == R.id.nav_help) {
+        } else if (id == R.id.nav_tutorial) {
             fragmentMangager.beginTransaction()
                     .replace(R.id.content_main, new TutorialFragment())
                     .commit();
             textView.setVisibility(View.GONE);
 
-        } else if (id == R.id.nav_contactUs) {
+        } else if (id == R.id.nav_help) {
             fragmentMangager.beginTransaction()
                     .replace(R.id.content_main, new HelpFragment())
                     .commit();
