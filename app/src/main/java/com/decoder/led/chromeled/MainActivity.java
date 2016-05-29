@@ -197,6 +197,8 @@ public class MainActivity extends AppCompatActivity
 
         }
 
+        textView.setVisibility(View.GONE);
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
