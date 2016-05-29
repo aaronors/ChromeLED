@@ -6,6 +6,7 @@
 
     <string name="action_settings">Settings</string>
     <string name="title_activity_tutorial">Tutorial Activity</string>
+    <string name="help_text">Please let us know if you experience any problems with our application.</string>
     <string name="large_text">
         "Material is the metaphor.\n\n"
 
