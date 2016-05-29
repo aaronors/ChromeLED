@@ -190,9 +190,9 @@ public class MainActivity extends AppCompatActivity
                     .commit();
             textView.setVisibility(View.GONE);
 
-        } else if (id == R.id.nav_help) {
+        } else if (id == R.id.nav_contact_us) {
             fragmentMangager.beginTransaction()
-                    .replace(R.id.content_main, new HelpFragment())
+                    .replace(R.id.content_main, new ContactUsFragment())
                     .commit();
 
         }

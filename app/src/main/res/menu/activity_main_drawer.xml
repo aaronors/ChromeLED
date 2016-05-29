@@ -15,9 +15,9 @@
             android:icon="@drawable/tutorial"
             android:title="Tutorial" />
         <item
-            android:id="@+id/nav_help"
-            android:icon="@drawable/help"
-            android:title="Help" />
+            android:id="@+id/nav_contact_us"
+            android:icon="@drawable/contact_us"
+            android:title="Contact Us" />
     </group>
 
 </menu>

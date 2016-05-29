@@ -1,24 +1,20 @@
 package com.decoder.led.chromeled;
 
 
-import android.app.Activity;
-import android.app.Notification;
-import android.content.Intent;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class HelpFragment extends Fragment {
+public class ContactUsFragment extends Fragment {
 
     View myView;
-    public HelpFragment() {
+    public ContactUsFragment() {
         // Required empty public constructor
     }
 
@@ -27,8 +23,8 @@ public class HelpFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        ((MainActivity) getActivity()).setActionBarTitle("Help");
-        return inflater.inflate(R.layout.help_layout, container, false);
+        ((MainActivity) getActivity()).setActionBarTitle("Contact Us");
+        return inflater.inflate(R.layout.contact_us_layout, container, false);
     }
 
     /* test
