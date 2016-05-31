@@ -3,6 +3,7 @@ package com.decoder.led.chromeled;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
@@ -212,5 +213,20 @@ public class MainActivity extends AppCompatActivity
 
     public void setActionBarTitle(String title) {
         getSupportActionBar().setTitle(title);
+    }
+
+    public void ContactUs(View view) {
+        Intent chooser = null;
+        //String filelocation="/mnt/sdcard/contacts_sid.vcf";
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setData(Uri.parse("mailto:"));
+        String[] to={"3805la+djdigi02fp9bo@sharklasers.com"};
+        intent.putExtra(Intent.EXTRA_EMAIL, to);
+        intent.putExtra(Intent.EXTRA_SUBJECT, "Customer Support");
+        //intent.putExtra(Intent.EXTRA_STREAM, filelocation);
+        intent.putExtra(Intent.EXTRA_TEXT, "Sent from mobile app.");
+        intent.setType("message/rfc822");
+        chooser = Intent.createChooser(intent, "Send Email");
+        startActivity(chooser);
     }
 }
