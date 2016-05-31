@@ -195,10 +195,10 @@ public class MainActivity extends AppCompatActivity
             fragmentMangager.beginTransaction()
                     .replace(R.id.content_main, new ContactUsFragment())
                     .commit();
-
+            textView.setVisibility(View.GONE);
         }
 
-        textView.setVisibility(View.GONE);
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
