@@ -84,6 +84,8 @@ public class MainActivity extends AppCompatActivity
         }
         textView.setText(stringBuffer.toString());//end of error message display
         */
+
+
     }
 
     //clear savefile
