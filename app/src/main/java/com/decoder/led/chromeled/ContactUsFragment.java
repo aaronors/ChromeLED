@@ -27,4 +27,15 @@ public class ContactUsFragment extends Fragment {
         return inflater.inflate(R.layout.contact_us_layout, container, false);
     }
 
+    /* test
+    public void sendEmail()
+    {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("plain/text");
+        intent.putExtra(Intent.EXTRA_EMAIL, new String[] { "some@email.address" });
+        intent.putExtra(Intent.EXTRA_SUBJECT, "subject");
+        intent.putExtra(Intent.EXTRA_TEXT, "mail body");
+        startActivity(Intent.createChooser(intent, ""));
+    }
+    */
 }

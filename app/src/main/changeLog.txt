@@ -2,6 +2,11 @@
 
 May 18, 2016
 =================
+- changed error log layout
+- incorporated escape char in decoding
+
+May 18, 2016
+=================
 - switched int[] to String input on results
 - added additional debugging information on results page
 
