@@ -1,5 +1,16 @@
 //This file is just a log of detailed changes not covered by git messages
 
+
+June 6th, 2016
+=================
+-Sync github with more recent results and detect activity
+-removed process button on detection screen
+-show statistics on results page for debugging purposes
+-added saves to external storage device
+-added save and load error logging
+-updated layout
+
+
 May 18, 2016
 =================
 - changed error log layout

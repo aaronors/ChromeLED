@@ -12,36 +12,6 @@
     tools:context="com.decoder.led.chromeled.Results"
     tools:showIn="@layout/activity_results">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView_activity_results"
-        android:layout_marginTop="33dp"
-        android:text="Hello world!"
-        android:layout_below="@+id/bugInfo"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Data info"
-        android:id="@+id/bugInfo"
-        android:layout_below="@+id/Debug_textView"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="15dp" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Debug Data"
-        android:id="@+id/Debug_textView"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
     <Button
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
@@ -52,25 +22,67 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:onClick="saveText" />
-
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Extra"
-        android:id="@+id/extratextView"
-        android:layout_below="@+id/textView_activity_results"
+        android:text="Data info"
+        android:id="@+id/bugInfo"
+        android:layout_below="@+id/Debug_textView"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="36dp" />
-
-    <Button
+        android:layout_marginTop="15dp" />
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Load"
-        android:id="@+id/loadbutton"
-        android:onClick="loadText"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Debug Data"
+        android:id="@+id/Debug_textView"
         android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@+id/save_button"
-        android:layout_toStartOf="@+id/save_button" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/bugInfo"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="38dp">
+
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/bugInfo"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView_activity_results"
+                android:text="Raw Data"
+                android:layout_below="@+id/bugInfo"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Output Msg"
+                android:id="@+id/extratextView"
+                android:layout_below="@+id/textView_activity_results"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginTop="36dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Parsed Binary"
+                android:id="@+id/parsed_bin_textView"
+                android:layout_below="@+id/extratextView"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginTop="34dp" /></RelativeLayout>  </ScrollView>
+
 
 </RelativeLayout>

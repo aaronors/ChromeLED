@@ -1,165 +1,104 @@
 package com.decoder.led.chromeled;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
-import org.opencv.core.Core;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfPoint;
 import org.opencv.core.Scalar;
-import org.opencv.core.Size;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
+
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Menu;
+import android.os.SystemClock;
 import android.view.MenuItem;
 import android.view.SurfaceView;
-import android.view.View;
 import android.view.WindowManager;
 import android.view.MotionEvent;
-import android.widget.Button;
 import android.widget.Toast;
-
+import android.util.Log;
+import java.util.ArrayList;
 
 public class DetectActivity extends Activity implements CvCameraViewListener2 {
     private static final String TAG = "OCVLed::Activity";
-
     private CameraBridgeViewBase mOpenCvCameraView;
-    private boolean              mIsJavaCamera = true;
-    private MenuItem             mItemResults;
 
     //*** PROCESSING VARIABLES DEFINITIONS BEGIN ***//
     int THRESHOLD = 200; //pixels above this threshold will display as black (used by Imgproc.threshold())
     int MAX = 255; //maximum possible pixel intensity (used by Imgproc.threshold())
-    Mat myImage; //openCV matrix representing an image; used for processing frames retrieved from camera
-    int COUNT, WIDTH, HEIGHT; //used to calculate of number of pixels above threshold
-    public boolean first = true;
-    Mat prev;
-    private boolean screenTap = false;
-    int tapCnt = 0;
-    private boolean flag = true;
-    int xPos;
-    int yPos;
-    Point rectPoint1;
-    Point rectPoint2;
-    Mat subImage;
-    Mat mask;
-    Timer timer; // assigned in oncreate, used to perform processing every 100ms
-    boolean process = false; // flag that enables processing; set true by timer, set false after processing done
-    int signalIndex = 0; // start index at 0, used to iterate through signal[]
-    String signal = ""; // array of signal values, allocated to 1024 in oncreate
-    Button processButton;
+    Mat myImage, croppedImg; //openCV matrix representing an image; used for processing frames retrieved from camera
+    int WIDTH, HEIGHT; // used for dimension of screen and images
+    long diff; // used to report the difference between timestamps
+    boolean screenTap = false; // used for drawing ROI, procesing, and setting toast
+    Point rectPoint1, rectPoint2; // used to draw ROI in onCameraFrame; initialized in onTouch
+    Scalar redOutline = new Scalar(255, 0, 0); // used to draw ROI
+    Rect subRectangle; // used for ROI
+    int MAXBUFFSIZE = 128; // must be before declaration of times[]; controls number of timestamps and frames before trying to detect
+    int MAXSIGNALTIME = 100; // amount of time signal is high, used to determine if a frame was missed
+    int MISSEDFRAMESIZE = 50; // max number of missed frames to store
+    public static ArrayList<Mat> images = new ArrayList<Mat>(); // public static allows this to be accessed from other activities
+    long times[] = new long[MAXBUFFSIZE]; // long array of timestamps
+    int missedFrames[] = new int[MISSEDFRAMESIZE]; // int array of index where a miss occurred so index can be used to try to recover from repeated signal
+    int missedFrameIndex=0;
+    boolean missedFrame = false; // bool to quickly see if we have missed a frame before
+    int timeIndex = 0; // start index at 0, used to iterate through time[]
+    float x1, y1, x2, y2;
     //*** PROCESSING VARIABLES DEFINITIONS END ***//
-
-    public boolean onCreateOptionsMenu(Menu menu) {
-        Log.i(TAG, "called onCreateOptionsMenu");
-        mItemResults  = menu.add("Results");
-        return true;
-    }
-
-    public boolean onOptionsItemSelected(MenuItem item) {
-        Log.i(TAG, "called onOptionsItemSelected; selected item: " + item);
-        //intent declaration to switch activities
-        //int[] arry = {1,1,1,0,0,1,0,0,1,0,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,1,0,0,0,0,1,1,0,1,0,1,1,1,1,
-        //      0,1,1,1,0,1,0,1,0,1,0,0,1,0,0,0,1,0,1,0,1,0,1,0,0,0,1,0,1,0,1,1,1,0,0,0,0,1,0,1,0,0,0,1,1,0,0,0,1,0,1,0,1,1,0,0,1,0,0,0,0,1,1,1,1,1,1,0,0,1,0,1,0,0,1,1,0,0,0,1,0,0,1,1,0,1,1,1,1,0,0,0,0,1,0,1,1,1,1,1,1,1,1,0,0,0,1,0,0,1,0,1,0,0,1,1,1,1,0,0,1,0,1,1,1,1,0,1,0,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,0,1,0,1,0,0,1,0,1,0,0,0,0,0,1,1,0,1,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0,1,1,0,1,1,1,0,0,1,0,0,0,0,1,0,1,0,0,0,0,0,1,1,1,0,0,0,0,0,1};
-
-        //temporary string of binary
-        //String randoLondo = "0100100001100101011100100110010100100000011010010111001100100000011000010010000000110011001100100010000001100010011110010111010001100101001000000110110101100101011100110111001101100001011001110110010100100001001000010010000100100001001000010010000100100001";
-        if (item == mItemResults) {
-            Intent myintent = new Intent(DetectActivity.this, Results.class);
-            myintent.putExtra("Message", "Results have been passed!");
-            //myintent.putExtra("Array", arry);
-            //myintent.putExtra("bitString", randoLondo); //randoLondo is placeholder for input bit string
-            myintent.putExtra("signalIn", signal);
-            //startActivity(myintent);
-            DetectActivity.this.startActivity(myintent);
-        }
-        return true;
-    }
-
-    public void switchResults(View view){
-        Intent myintent = new Intent(DetectActivity.this, Results.class);
-        //String randoLondo = "0100100001100101011100100110010100100000011010010111001100100000011000010010000000110011001100100010000001100010011110010111010001100101001000000110110101100101011100110111001101100001011001110110010100100001001000010010000100100001001000010010000100100001";
-        //int[] arry = {1,1,1,0,0,1,0,0,1,0,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,1,0,0,0,0,1,1,0,1,0,1,1,1,1,
-        //        0,1,1,1,0,1,0,1,0,1,0,0,1,0,0,0,1,0,1,0,1,0,1,0,0,0,1,0,1,0,1,1,1,0,0,0,0,1,0,1,0,0,0,1,1,0,0,0,1,0,1,0,1,1,0,0,1,0,0,0,0,1,1,1,1,1,1,0,0,1,0,1,0,0,1,1,0,0,0,1,0,0,1,1,0,1,1,1,1,0,0,0,0,1,0,1,1,1,1,1,1,1,1,0,0,0,1,0,0,1,0,1,0,0,1,1,1,1,0,0,1,0,1,1,1,1,0,1,0,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,0,1,0,1,0,0,1,0,1,0,0,0,0,0,1,1,0,1,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0,1,1,0,1,1,1,0,0,1,0,0,0,0,1,0,1,0,0,0,0,0,1,1,1,0,0,0,0,0,1};
-
-        //myintent.putExtra("Message", "Results have been passed!");
-        //myintent.putExtra("Array", arry);
-        //myintent.putExtra("bitString", randoLondo); //randoLondo is placeholder for input bit string
-        myintent.putExtra("signalIn", signal);
-        //startActivity(myintent);
-        DetectActivity.this.startActivity(myintent);
-    }
-
-    //*** PROCESSING VARIABLES DEFINITIONS END ***//
+    Toast toaster;
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
         public void onManagerConnected(int status) {
             switch (status) {
-                case LoaderCallbackInterface.SUCCESS:
-                {
+                case LoaderCallbackInterface.SUCCESS: {
                     Log.i(TAG, "OpenCV loaded successfully");
                     mOpenCvCameraView.enableView();
-                } break;
-                default:
-                {
+                }
+                break;
+                default: {
                     super.onManagerConnected(status);
-                } break;
+                }
+                break;
             }
         }
     };
 
-
-
-    /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Log.i(TAG, "called onCreate");
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
         setContentView(R.layout.detect_surface_view);
-
         mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.detect_activity_java_surface_view);
-
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
-
         mOpenCvCameraView.setCvCameraViewListener(this);
-        processButton = (Button)findViewById(R.id.process_button);
-        //   processButton.setVisibility(View.GONE);
+        toaster = Toast.makeText(this,"", Toast.LENGTH_LONG);
     }
 
     @Override
-    public void onPause()
-    {
+    public void onPause() {
         super.onPause();
         if (mOpenCvCameraView != null)
             mOpenCvCameraView.disableView();
+        toaster.cancel();
     }
 
     @Override
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
         if (!OpenCVLoader.initDebug()) {
-            //Log.d(TAG, "Internal OpenCV library not found. Using OpenCV Manager for initialization");
+            Log.d(TAG, "Internal OpenCV library not found. Using OpenCV Manager for initialization");
             OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_0_0, this, mLoaderCallback);
         } else {
-            // Log.d(TAG, "OpenCV library found inside package. Using it!");
+            Log.d(TAG, "OpenCV library found inside package. Using it!");
+            reset();
+            screenTap = false;
             mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
         }
     }
@@ -168,6 +107,7 @@ public class DetectActivity extends Activity implements CvCameraViewListener2 {
         super.onDestroy();
         if (mOpenCvCameraView != null)
             mOpenCvCameraView.disableView();
+        toaster.cancel();
     }
 
     public void onCameraViewStarted(int width, int height) {
@@ -180,96 +120,133 @@ public class DetectActivity extends Activity implements CvCameraViewListener2 {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        xPos = (int)event.getX();
-        yPos = (int)event.getY();
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
             case MotionEvent.ACTION_MOVE:
             case MotionEvent.ACTION_UP:
         }
-        //Toast.makeText(Tutorial1Activity.this, "xPos= "+xPos+","+"yPos= "+yPos, Toast.LENGTH_SHORT).show();
-        screenTap = true;
 
+        //grab points where screen is touched to use as corners for rectangle based on dimensions of phone screen
+
+        x1=event.getX() + (HEIGHT + WIDTH)/16;
+        y1=event.getY() + (HEIGHT + WIDTH)/16;
+        x2=event.getX() - (HEIGHT + WIDTH)/16;
+        y2=event.getY() - (HEIGHT + WIDTH)/16;
+
+        if (x1 <= 0) {
+            x1 = 1;
+        }
+        if (x2 <= 0) {
+            x2 = 1;
+        }
+        if (y1 <= 0) {
+            y1 = 1;
+        }
+        if (y2 <= 0) {
+            y2 = 1;
+        }
+
+        if (x1 >= WIDTH) {
+            x1 = WIDTH-1;
+        }
+        if (x2 >= WIDTH) {
+            x2 = WIDTH-1;
+        }
+        if (y1 >= HEIGHT) {
+            y1 = HEIGHT-1;
+        }
+        if (y2 >= HEIGHT) {
+            y2 = HEIGHT-1;
+        }
+
+        rectPoint1=new Point(x1,y1);
+        rectPoint2=new Point(x2,y2);
+        subRectangle = new Rect(rectPoint1,rectPoint2);
+
+        //set bool to draw ROI in onCameraFrame
+        if(event.getAction() == android.view.MotionEvent.ACTION_UP) {
+            if (!screenTap) {
+                screenTap = true;
+                //Toast.makeText(getApplicationContext(), "ROI Selected. Now processing . . .", Toast.LENGTH_LONG).show();
+                toaster.setText("ROI Selected. Now processing . . .");
+                toaster.show();
+            } else if (screenTap) {
+                //Toast.makeText(getApplicationContext(), "New ROI Selected. Restarted processing . . .", Toast.LENGTH_LONG).show();
+                toaster.setText("New ROI Selected. Restarted processing . . .");
+                toaster.show();
+            }
+        }
+        reset();
         return false;
     }
 
 
-    // screenTap
+    public Void reset() {
+        timeIndex = 0;
+        images.clear();
+        missedFrame = false;
+        missedFrameIndex=0;
+        return null;
+    }
 
+    public Void processIntent() {
+        //TODO: clear toasts
+        Intent myIntent = new Intent(DetectActivity.this, Results.class);
+        myIntent.putExtra("times", times);
+        myIntent.putExtra("timeIndex", timeIndex);
+        myIntent.putExtra("missedFrame", missedFrame);
+        myIntent.putExtra("missedFrames", missedFrames);
+        myIntent.putExtra("missedFrameIndex", missedFrameIndex);
+        DetectActivity.this.startActivity(myIntent);
+        // NOTE: thread may not be fully suspended yet, so this may still be running while calling next intent and could cause out of bounds array exception
+        return null;
+    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
-
-        //DECLARATIONS
-        COUNT=0;
-        myImage = inputFrame.rgba();
-        Mat origImage = inputFrame.rgba();
-        //boolean show = false;
-
-        /*** MOVING THESE OUT OF THIS FUNCTION CAUSES SEGFAULT ***/
-        Scalar CONTOUR_COLOR = new Scalar(0,255,0);
-        Mat mHierarchy = new Mat();
-        List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
-
-        //---------------------------
-        //      Image Processing
-        //---------------------------
-
-        if(flag) {
-            subImage = Mat.zeros(myImage.size(), myImage.type());
-            mask = Mat.zeros(myImage.size(), myImage.type());
-            flag = false;
+        //if we think we have enough samples, call the next intent to process and pass it necessary values
+        if (timeIndex == MAXBUFFSIZE) {
+            processIntent();
         }
 
-        // if touch screen draw rectangle on frame which will be the ROI
-        if(screenTap){
-            rectPoint1=new Point(xPos+200,yPos+200);
-            rectPoint2=new Point(xPos-200,yPos-200);
+        myImage = inputFrame.rgba();
 
-            Imgproc.rectangle(mask,rectPoint1,rectPoint2,new Scalar(255,255,255),-1,8,0);
-            Imgproc.rectangle(origImage,rectPoint1,rectPoint2,new Scalar(255,0,0),5);
+        // if touch screen draw rectangle on frame which will be the ROI, process, and store timestamp
+        if (screenTap && timeIndex < MAXBUFFSIZE) {
+            //TODO: change timestamp recording to only record differences; use two values for first stamp and next stamp - store differences. Why recalculate?
+            times[timeIndex] = System.nanoTime() / 1000000;
+            //SystemClock.elapsedRealtimeNanos()/1000000; //get the time when we capture a frame; apparently elapsedRealtimeNano requires >= API 17
 
-            myImage.copyTo(subImage,mask);
+            Imgproc.rectangle(myImage, rectPoint1, rectPoint2, redOutline, 5); // draw red ROI rectangle
 
-            Imgproc.cvtColor(subImage, subImage, Imgproc.COLOR_RGB2GRAY);
-
-            Imgproc.threshold(subImage, subImage, THRESHOLD, MAX, Imgproc.THRESH_BINARY);
-
-            Imgproc.findContours(subImage, contours, mHierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
-
-            Imgproc.drawContours(origImage,contours,-1,CONTOUR_COLOR,7);
-
-            Log.i(TAG, "Count = " + contours.size());
-            if(contours.size() > 0)
-                signal += "1";
-            else
-                signal += "0";
-            Log.i(TAG, "Signal Length: " + signal.length());
-            //show process button when long enough
-            /*if(show == false) {
-                if (signal.length() >= 32) {
-                    show = true;
-                    processButton.setVisibility(View.VISIBLE);
+            //TODO: check to see if enough time has elapsed before capturing frame; if not enough skip
+          /*  if (timeIndex > 1) {
+                diff = (times[timeIndex] - times[timeIndex - 1]);
+                if (diff < 50) {
+                    return myImage;
                 }
+                diff = 0;
             }*/
 
-            // signalIndex=signalIndex%1024; // mod by size so that signalIndex wraps around when it reaches 1024
-            //signal[signalIndex] = contours.size(); // for now just store how many contours there were within ROI -- later store number of pixels
-            //signalIndex++;
+            //get just the ROI, then grayscale and threshold so more memory efficient (need to store many matrices into arrayList)
+            croppedImg = myImage.submat(subRectangle);
+            Imgproc.cvtColor(croppedImg, croppedImg, Imgproc.COLOR_RGB2GRAY);
+            Imgproc.threshold(croppedImg, croppedImg, THRESHOLD, MAX, Imgproc.THRESH_BINARY);
+            images.add(croppedImg.clone()); // may need to clone to actually get the image
+
+
+            if (timeIndex > 1) { //only take the difference if we have a time already
+                diff = ((times[timeIndex] - times[timeIndex - 1]));
+                Log.i(TAG, "diff = " + diff + ", frames = " + images.size() + ", missedFrames = " + missedFrameIndex);
+                if (diff >= MAXSIGNALTIME && missedFrameIndex < MISSEDFRAMESIZE) { // check if we missed a frame based on delay; check if enough space in missedFrames
+                    missedFrame = true;
+                    missedFrames[missedFrameIndex] = timeIndex;
+                    missedFrameIndex++;
+                }
+            }
+            timeIndex++; // very last thing we should do
+
         }
-        //process = false; // reset flag to false to show that processing has completed
-
-        return origImage;
-
+        return myImage;
     }
-
-  /*  class myTask extends TimerTask {
-        @Override
-        public void run() {
-            if (process)
-                Log.d("TimerTask","Called TimerTask while still trying to process in onCameraFrame. Delay may not be long enough");
-            else
-                process = true;
-            Log.d("TimerTask","Called TimerTask -- global flag process set to " + process);
-        }
-    }
-    */
 }

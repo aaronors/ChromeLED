@@ -3,21 +3,18 @@ package com.decoder.led.chromeled;
 import android.content.Context;
 import android.os.Bundle;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.lang.String;
+import java.util.List;
+import java.util.zip.ZipEntry;
 
 import android.os.Environment;
-import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -27,16 +24,21 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
 import org.w3c.dom.Text;
 
 
 public class Results extends AppCompatActivity {
     private static final String TAG = "ResultsPage";
-    //public String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/ChromeLED";
-    TextView tv;
     String out;
-
-
+    boolean startFound = false;
+    boolean endFound = false;
+    //TextView tv = (TextView)findViewById(R.id.textView_activity_results);
+    String interpoles = "";
+    TextView tv3;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,7 +47,6 @@ public class Results extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         HashMap<String, String> key = new HashMap<String, String>();
-        //regular binary to hex representations
         key.put("0000", "0");
         key.put("0001", "1");
         key.put("0010", "2");
@@ -63,35 +64,91 @@ public class Results extends AppCompatActivity {
         key.put("1110", "E");
         key.put("1111", "F");
 
-
-        //bundle setup, pass data between activities
+        //bundle setup, refer between results activity and tutorial1activity
+        String temp = "Statistics: \n";
+        //String interpoles = "";
+        int i = 0;
         Bundle extras = getIntent().getExtras();
-        //int[] receivedData = extras.getIntArray("Array");
-        String signalValues = extras.getString("signalIn");
-
-        tv = (TextView)findViewById(R.id.textView_activity_results);
-        TextView tv2 = (TextView)findViewById(R.id.bugInfo);
-        //String bitS = extras.getString("bitString");
-        //tv.setText(extras.getString("Message"));
-        String debugOut = null;
-        debugOut = "Signal length: " + signalValues.length() + '\n' + "Some 8 bytes: ";
-        if (signalValues.length() < 32) {
-            if(signalValues != null) {
-                debugOut += "signalValues shorter than 64";
-            }
+        //TextView tv = (TextView)findViewById(R.id.textView_activity_results);
+        tv3 = (TextView)findViewById(R.id.textView_activity_results);
+        TextView tv2 = (TextView)findViewById(R.id.extratextView);
+        TextView parseTV = (TextView)findViewById(R.id.parsed_bin_textView);
+        long[] ts = extras.getLongArray("times");
+        long ts0 = ts[0], diff = 0;
+        String bins = processImages(extras.getLongArray("times"), extras.getInt("timeIndex"), extras.getBoolean("missedFrame"), extras.getIntArray("missedFrames"), extras.getInt("missedFrameIndex"));
+        Log.i(TAG, "array 0 time: " + extras.getLongArray("times")[0] + " array 1 time: " + extras.getLongArray("times")[1] + " diff = " + (extras.getLongArray("times")[30] - extras.getLongArray("times")[29] ));
+        while(i < bins.length()){
+            if(i > 0)
+                diff = ts[i] - ts[i-1];
+            temp+= ("T" + i+  ": "+ (ts[i] - ts0) + ", Diff = "+ diff +", Value: " + bins.charAt(i) + "\n");
+            interpoles+= (ts[i] - ts0) + "\n";
+            i++;
+        }//
+        i = 0;
+        while(i < bins.length()){
+            //Redundant loop to add values to interpoles for view on textfile
+            interpoles+= bins.charAt(i) + "\n";
+            i++;
         }
-        else {
-            debugOut += "here should be substring of signals";
-            //debugOut += signalValues.substring(0, 32);
+        if(isExternalStorageWritable() == true){
+            //tv3.setText("external is available");
+            writeToSDFile(interpoles);
         }
-            //int[] signalBinary = valuetoBinary(signalValues);
+        else
+            tv3.setText("External Storage not writable!");
+        //tv.setText(interpoles);
+        tv3.setText("Raw Data: " + bins + "\nLength: " + bins.length());
+        //temp = signalParser(bins, extras.getLongArray("times"));
+        //String test = "0101100111010101010101010111100110011111111111111110000001100111111111";
+        parseTV.setText("Parsed Data: " + temp + "\n Length: " + temp.length());
+        out = msgDecode(bins, key);
+        tv2.setText(out);
+        Toast.makeText(getApplicationContext(), "startFound: " +startFound + ", endFound: "+ endFound, Toast.LENGTH_LONG).show();
 
-        out = "Message in Hex: " + msgDecode(signalValues, key);
-        //String out = msgDecode(receivedData, key);
-        tv2.setText(debugOut);
-        tv.setText(out);
 
-    }//end of on create
+    }
+    private void writeToSDFile(String toWrite){
+
+        // Find the root of the external storage.
+        // See http://developer.android.com/guide/topics/data/data-  storage.html#filesExternal
+
+        File root = android.os.Environment.getExternalStorageDirectory();
+        //tv3.append("\nExternal file system root: "+root);
+
+        // See http://stackoverflow.com/questions/3551821/android-write-to-sd-card-folder
+
+        File dir = new File (root.getAbsolutePath() + "/ChromeLED");
+        dir.mkdirs();
+        File file = new File(dir, "myData.txt");
+
+        try {
+            FileOutputStream f = new FileOutputStream(file);
+            PrintWriter pw = new PrintWriter(f);
+            pw.println(toWrite);
+            //pw.println("Hello");
+            pw.flush();
+            pw.close();
+            f.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            Log.i(TAG, "******* File not found. Did you" +
+                    " add a WRITE_EXTERNAL_STORAGE permission to the   manifest?");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //tv3.append("\n\nFile written to "+file);
+    }
+
+    /* Checks if external storage is available for read and write */
+    public boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+
+
 
     public void saveText(View view){
         String filename = "savefile";
@@ -110,42 +167,46 @@ public class Results extends AppCompatActivity {
         }
     }
 
-    public void loadText(View view){
-        String Message;
-        TextView textView = (TextView)findViewById(R.id.extratextView);
+    String processImages(long[] times, int numTimes, boolean missedFrame, int[] missedFrames, int missedFrameIndex) {
+        String retString = "";
 
-        try{
-        FileInputStream fileInputStream = openFileInput("savefile");
-        InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
-        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-        StringBuffer stringBuffer = new StringBuffer();
-        while ((Message = bufferedReader.readLine()) != null)
-        {
-            stringBuffer.append(Message + "\n");
+        if (missedFrame) {
+            for (int i=0; i < missedFrameIndex; i++) {
+                Log.i(TAG, "Missed frame " + missedFrames[i]);
+            }
         }
-        textView.setText(stringBuffer.toString());
-        textView.setVisibility(View.VISIBLE);
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e){
-            e.printStackTrace();
+        for (int i=0; i < numTimes; i++) {
+            long myTimestamp = times[i];
+
+            Mat mHierarchy = new Mat();
+            List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
+            Scalar CONTOUR_COLOR = new Scalar(0,255,0);
+
+            if (DetectActivity.images.size() != 0) {
+                Mat myMat = DetectActivity.images.get(i);
+                Imgproc.findContours(myMat, contours, mHierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+            }
+
+            if(contours.size() > 0)
+                retString += "1";
+            else
+                retString += "0";
+            Log.i(TAG, "retString = " + retString + ", times[" + i + "] = " + times[i] + ", numContours = " + contours.size());
         }
+        return retString;
     }
-
 
     public String msgDecode(String bitString, HashMap<String, String> key ){
         //start here
         String buffer = null;
-        //String buffer2 = null;
-        //String hexTodecimal = null;
         String outMsg = "";
-        //int decimal = 0;
         String decMsg = "";
-        int j = 0;
-        int modLength = 0;
+        int j = 0, chopped = 0;
+        int modLength = 0, modLength2 = 0;
         int bitLength = bitString.length();
         int decLength;
+        String startCode = "1010101010101010";
         //decoding process
         modLength = bitLength % 4;
         if(bitLength > 0) {
@@ -155,17 +216,32 @@ public class Results extends AppCompatActivity {
                 //will bitString.length be same as bitLength? during our process
             }
             else if(bitLength > 4) {
-                for (int i = 0; i < (bitLength - modLength); i += 4) {
-                    //for int array
-                    //buffer = Integer.toString(bitString[i]) + Integer.toString(bitString[i + 1]) + Integer.toString(bitString[i + 2]) + Integer.toString(bitString[i + 3]);
-                    //** Code for String of bits input **
-                    //decMsg contains a string of hex characters from byte
-                    buffer = bitString.substring(i, i + 4);
-                    decMsg += key.get(buffer);
-                    //decMsg contains Hex
+                //account for chopping of bits
+                while(((chopped + 16) < (bitLength - modLength)) && (startFound == false)){//ensure we dont go apst length
+                    Log.i(TAG, "Here is sub string: " + bitString.substring(chopped, chopped + 16));
+                    //if((bitString.substring(chopped, chopped + 16)) == startCode) {
+                    if((bitString.substring(chopped, chopped + 16)).equals(startCode)){
+                        startFound = true;
+                    }
+                    else chopped++;
+                }//end while loop looks for start signal so we do decode starting at chopped
+                if(startFound == true){
+                    modLength2 = (bitLength - chopped) % 4;
+                    //take into account the chopped
+                    for (int i = chopped; i+4 < (bitLength - modLength2); i += 4) {
+                        buffer = bitString.substring(i, i + 4);
+                        decMsg += key.get(buffer);
+                    }
+                } else {
+                    for (int i = 0; i < (bitLength - modLength); i += 4) {
+                        buffer = bitString.substring(i, i + 4);
+                        decMsg += key.get(buffer);
+                    }
+                    return "start not found, Entire converted string: " + decMsg;
                 }
             }
         }
+
         //without ascii conversion ( prints decMsg )
         //outMsg = decMsg;
         decLength = decMsg.length();
@@ -176,19 +252,24 @@ public class Results extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Odd length, message has been padded", Toast.LENGTH_LONG).show();
         }
         if((decLength > 4) && ((decMsg.length() % 2) == 0)) {
-            while (j < decMsg.length()) {
+            while ((j < decMsg.length()) && (endFound == false)) {
                 //check for escape char 0xDB
-                if (decMsg.substring(j, j + 2) == "DB") {
+                if (decMsg.substring(j, j + 2).equals("DB")) {
                     j += 2;
-                    if (decMsg.substring(j + 2, j + 4) == "50")
+                    if (decMsg.substring(j + 2, j + 4).equals("50"))
                         outMsg += "C0";
-                    else if (decMsg.substring(j + 2, j + 4) == "51")
+                    else if (decMsg.substring(j + 2, j + 4).equals("51"))
                         outMsg += "AA";
-                    else if (decMsg.substring(j + 2, j + 4) == "52")
+                    else if (decMsg.substring(j + 2, j + 4).equals("52"))
                         outMsg += "DB";
                     else
                         outMsg += "??";
-                } else {
+                }
+                else if(decMsg.substring(j, j + 2).equals("C0")) {
+                    endFound = true;
+                    outMsg += decMsg.substring(j, j + 2);
+                }
+                else {
                     outMsg += decMsg.substring(j, j + 2);
                 }
                 //covert 1 byte into ascii
@@ -201,7 +282,5 @@ public class Results extends AppCompatActivity {
             outMsg += "while loop failed";
         return outMsg;
         //add error handling?
-    }
-
-
-}//end of results activity
+    }//end of msgDecode
+}
