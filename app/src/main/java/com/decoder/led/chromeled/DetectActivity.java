@@ -39,7 +39,7 @@ public class DetectActivity extends Activity implements CvCameraViewListener2 {
     Point rectPoint1, rectPoint2; // used to draw ROI in onCameraFrame; initialized in onTouch
     Scalar redOutline = new Scalar(255, 0, 0); // used to draw ROI
     Rect subRectangle; // used for ROI
-    int MAXBUFFSIZE = 128; // must be before declaration of times[]; controls number of timestamps and frames before trying to detect
+    int MAXBUFFSIZE = 512; // must be before declaration of times[]; controls number of timestamps and frames before trying to detect
     int MAXSIGNALTIME = 100; // amount of time signal is high, used to determine if a frame was missed
     int MISSEDFRAMESIZE = 50; // max number of missed frames to store
     public static ArrayList<Mat> images = new ArrayList<Mat>(); // public static allows this to be accessed from other activities

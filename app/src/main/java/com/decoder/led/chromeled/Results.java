@@ -39,13 +39,14 @@ public class Results extends AppCompatActivity {
     //TextView tv = (TextView)findViewById(R.id.textView_activity_results);
     String interpoles = "";
     TextView tv3;
+    Toast showUser;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_results);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        showUser = Toast.makeText(this,"", Toast.LENGTH_LONG);
         HashMap<String, String> key = new HashMap<String, String>();
         key.put("0000", "0");
         key.put("0001", "1");
@@ -65,17 +66,20 @@ public class Results extends AppCompatActivity {
         key.put("1111", "F");
 
         //bundle setup, refer between results activity and tutorial1activity
-        String temp = "Statistics: \n";
+        String temp = "Statistics: \n", temp2 = "", temp3 = "";
         //String interpoles = "";
-        int i = 0;
         Bundle extras = getIntent().getExtras();
-        //TextView tv = (TextView)findViewById(R.id.textView_activity_results);
-        tv3 = (TextView)findViewById(R.id.textView_activity_results);
-        TextView tv2 = (TextView)findViewById(R.id.extratextView);
-        TextView parseTV = (TextView)findViewById(R.id.parsed_bin_textView);
+        int i = 0;
         long[] ts = extras.getLongArray("times");
         long ts0 = ts[0], diff = 0;
         String bins = processImages(extras.getLongArray("times"), extras.getInt("timeIndex"), extras.getBoolean("missedFrame"), extras.getIntArray("missedFrames"), extras.getInt("missedFrameIndex"));
+        tv3 = (TextView)findViewById(R.id.textView_activity_results);
+        TextView tv2 = (TextView)findViewById(R.id.extratextView);
+        TextView parseTV = (TextView)findViewById(R.id.parsed_bin_textView);
+        TextView timeStampTV = (TextView)findViewById(R.id.timeStampTV);
+        //TextView tv = (TextView)findViewById(R.id.textView_activity_results);
+
+
         Log.i(TAG, "array 0 time: " + extras.getLongArray("times")[0] + " array 1 time: " + extras.getLongArray("times")[1] + " diff = " + (extras.getLongArray("times")[30] - extras.getLongArray("times")[29] ));
         while(i < bins.length()){
             if(i > 0)
@@ -96,17 +100,110 @@ public class Results extends AppCompatActivity {
         }
         else
             tv3.setText("External Storage not writable!");
+
+        temp2 = rawParse(bins, ts);
+        temp3 = stringParse(temp2);
         //tv.setText(interpoles);
         tv3.setText("Raw Data: " + bins + "\nLength: " + bins.length());
         //temp = signalParser(bins, extras.getLongArray("times"));
         //String test = "0101100111010101010101010111100110011111111111111110000001100111111111";
-        parseTV.setText("Parsed Data: " + temp + "\n Length: " + temp.length());
-        out = msgDecode(bins, key);
-        tv2.setText(out);
+        //parseTV.setText("Parsed Data: " + temp + "\n Length: " + temp.length());
+        parseTV.setText("rawParse return: " + temp2 + "\n Length: " + temp2.length());
+        //timeStampTV.setText("Time Stamps: " + temp + "\n Length: " + temp.length());
+        timeStampTV.setText("String Parsed: " + ezRead(temp3) + "\n Length: " + temp3.length());
+
+        out = msgDecode(temp3, key);
+        tv2.setText("MsgDecode: " + out);
         Toast.makeText(getApplicationContext(), "startFound: " +startFound + ", endFound: "+ endFound, Toast.LENGTH_LONG).show();
+    }//end of on create
 
 
-    }
+
+    public String ezRead(String in){
+        int div = 4, modme = 0;
+        String outbutt = "", boofer = "";
+        for(int i = 0; i < in.length(); i++){
+            if((i % 4) == 0)
+                outbutt+=" ";
+            outbutt+=in.charAt(i);
+        }
+        return outbutt;
+    }//end o ezRead
+
+
+
+    public String rawParse(String rawData, long[] timeStamps){
+        int chopped = 0, i = 0;
+        String startSignal = "111000111000111000111000", outPutt = "";
+        while((chopped +24 < rawData.length()) && (!rawData.substring(chopped, chopped+24).equals(startSignal))){
+            Log.i(TAG, "Here is raw sub string: " + rawData.substring(chopped, chopped + 24));
+            chopped++;
+        }
+        if(rawData.substring(chopped, chopped+24).equals(startSignal))
+            showUser.setText("I've got you in my sights...");
+        else showUser.setText("no start in sight");
+        showUser.show();
+        outPutt = rawData.substring(chopped, rawData.length());
+        for(int j = 0; j < chopped; j++){
+            outPutt+= "0";
+        }//for loop to add back chopped bits, multiple base 2
+        return outPutt;
+    }//end of raw parse
+
+
+
+    public String stringParse(String input){
+        String buffer = "1", output = "";
+        int i = 0;
+        while (i < input.length()){
+            if(i == 0)
+                i++;//string should start at 1, thus ignore first bit
+            else {
+                //read 3 ins our if different from previous, needs leeway for 2 - 3 bits on occasion
+                if(input.charAt(i) == buffer.charAt(0)){     //buffer of only single type o bits
+                    buffer+=input.charAt(i);
+                }
+                else {
+                    //else do judgement, append to output, and clear buffer
+                    output += judgement(buffer);
+                    buffer = ""; //clear buffer
+                    buffer+= input.charAt(i);
+                }
+            }//endo not first input
+            i++;
+        }//endo while
+
+        return output;
+    }//end of stringparse
+
+    public String judgement(String defendant){
+        String value = "", output = "";
+        int spillage = 0;
+        int repeatFor = 0;
+        //NOTE: can have discrepnency if signals are just recorded longer than should be
+
+
+        if(defendant.length() > 0)
+            value = defendant.substring(0,1);
+        else return "We have a problem...";
+
+        if(defendant.length() > 2) {
+            spillage = (defendant.length() % 3);
+            repeatFor = (int)(defendant.length()/3);
+            if(spillage == 2)
+                repeatFor++;
+        }//3 o mo
+        else repeatFor = 1; //defendant.length() 1 or 2 thus count as 1
+
+        for(int i = 0; i < repeatFor; i++){
+            output+=value;
+        }
+
+        return output;
+    }//end of judgement
+
+
+
     private void writeToSDFile(String toWrite){
 
         // Find the root of the external storage.
