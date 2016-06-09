@@ -94,7 +94,8 @@ public class Results extends AppCompatActivity {
 
 
         Log.i(TAG, "decodeResults output");
-        outString = "Sampled Data" + "\n\n" + samplingResults + "\n\n" + "YOUR MESSAGE: " + printOut(decodeResults);
+        //outString = "Sampled Data" + "\n\n" + samplingResults + "\n\n" + "YOUR MESSAGE: " + printOut(decodeResults);
+        outString = "YOUR MESSAGE WAS: " + printOut(decodeResults);
         tv.setText(outString);
         //String decodeResults = msgDecode(samplingResults);
 
