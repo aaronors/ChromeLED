@@ -39,6 +39,8 @@ public class Results extends AppCompatActivity {
     //TextView tv = (TextView)findViewById(R.id.textView_activity_results);
     String interpoles = "";
     TextView tv3;
+    int blockSize = 0;
+
     Toast showUser;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,6 +116,8 @@ public class Results extends AppCompatActivity {
 
         out = msgDecode(temp3, key);
         tv2.setText("MsgDecode: " + out);
+        //showUser.setText("startFound: " +startFound + ", endFound: "+ endFound);
+        //showUser.show();
         Toast.makeText(getApplicationContext(), "startFound: " +startFound + ", endFound: "+ endFound, Toast.LENGTH_LONG).show();
     }//end of on create
 
@@ -134,15 +138,36 @@ public class Results extends AppCompatActivity {
 
     public String rawParse(String rawData, long[] timeStamps){
         int chopped = 0, i = 0;
-        String startSignal = "111000111000111000111000", outPutt = "";
-        while((chopped +24 < rawData.length()) && (!rawData.substring(chopped, chopped+24).equals(startSignal))){
-            Log.i(TAG, "Here is raw sub string: " + rawData.substring(chopped, chopped + 24));
+        //nexus 6 = 3
+        int avgBlocks = 3, startBlock = avgBlocks*8;
+        blockSize = avgBlocks;
+        String startSignal = "";//"111000111000111000111000";
+        String outPutt = "";
+        //String startSignal = "111111000000111111000000111111000000111111000000", outPutt = "";
+        for(int k = 0; k < 4; k++){
+            while(i < blockSize) {
+                startSignal += "1";
+                i++;
+            }
+            i = 0;
+            while(i < blockSize) {
+                startSignal += "0";
+                i++;
+            }
+            i = 0;
+        }//end of for loop
+        Log.i(TAG, "Here is our start: " + startSignal);
+        while((chopped + startBlock < rawData.length()) && (!rawData.substring(chopped, chopped+startBlock).equals(startSignal))){
+            //Log.i(TAG, "Here is raw sub string: " + rawData.substring(chopped, chopped + nexBlocks));
             chopped++;
         }
-        if(rawData.substring(chopped, chopped+24).equals(startSignal))
+        if(rawData.substring(chopped, chopped+startBlock).equals(startSignal)) {
             showUser.setText("I've got you in my sights...");
-        else showUser.setText("no start in sight");
+        } else
+            showUser.setText("no start in sight");
+
         showUser.show();
+
         outPutt = rawData.substring(chopped, rawData.length());
         for(int j = 0; j < chopped; j++){
             outPutt+= "0";
@@ -187,10 +212,10 @@ public class Results extends AppCompatActivity {
             value = defendant.substring(0,1);
         else return "We have a problem...";
 
-        if(defendant.length() > 2) {
-            spillage = (defendant.length() % 3);
-            repeatFor = (int)(defendant.length()/3);
-            if(spillage == 2)
+        if(defendant.length() > blockSize / 2) {//origninally 2
+            spillage = (defendant.length() % blockSize);
+            repeatFor = (int)(defendant.length()/blockSize);
+            if(spillage > blockSize / 2)
                 repeatFor++;
         }//3 o mo
         else repeatFor = 1; //defendant.length() 1 or 2 thus count as 1
@@ -346,6 +371,8 @@ public class Results extends AppCompatActivity {
         if((decLength % 2) != 0) {
             //decLength = decLength - 1;
             decMsg += "P";
+            //showUser.setText("Odd length, message has been padded");
+            //showUser.show();
             Toast.makeText(getApplicationContext(), "Odd length, message has been padded", Toast.LENGTH_LONG).show();
         }
         if((decLength > 4) && ((decMsg.length() % 2) == 0)) {
