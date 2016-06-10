@@ -189,8 +189,6 @@ public class DetectActivity extends Activity implements CvCameraViewListener2 {
     }
 
     public Void processIntent() {
-        //toaster.setText(MAXBUFFSIZE + " SAMPLES COLLECTED. ATTEMPTING TO PROCESS, PLEASE WAIT.");
-        //toaster.show();
         Intent myIntent = new Intent(DetectActivity.this, Results.class);
         myIntent.putExtra("times", times);
         myIntent.putExtra("missedFrames", missedFrames);
