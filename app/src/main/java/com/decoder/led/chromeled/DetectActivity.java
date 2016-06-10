@@ -34,21 +34,22 @@ public class DetectActivity extends Activity implements CvCameraViewListener2 {
     int MAX = 255; //maximum possible pixel intensity (used by Imgproc.threshold())
     Mat myImage, croppedImg; //openCV matrix representing an image; used for processing frames retrieved from camera
     int WIDTH, HEIGHT; // used for dimension of screen and images
-    long diff; // used to report the difference between timestamps
+    public static ArrayList<Mat> images = new ArrayList<Mat>(); // public static allows this to be accessed from other activities
+
     boolean screenTap = false; // used for drawing ROI, procesing, and setting toast
+    float x1, y1, x2, y2;
     Point rectPoint1, rectPoint2; // used to draw ROI in onCameraFrame; initialized in onTouch
     Scalar redOutline = new Scalar(255, 0, 0); // used to draw ROI
     Rect subRectangle; // used for ROI
+
     int MAXBUFFSIZE = 512; // must be before declaration of times[]; controls number of timestamps and frames before trying to detect
     int MAXSIGNALTIME = 100; // amount of time signal is high, used to determine if a frame was missed
     int MISSEDFRAMESIZE = 50; // max number of missed frames to store
-    public static ArrayList<Mat> images = new ArrayList<Mat>(); // public static allows this to be accessed from other activities
+    long diff; // used to report the difference between timestamps
     long times[] = new long[MAXBUFFSIZE]; // long array of timestamps
+    int timeIndex = 0; // start index at 0, used to iterate through time[]
     int missedFrames[] = new int[MISSEDFRAMESIZE]; // int array of index where a miss occurred so index can be used to try to recover from repeated signal
     int missedFrameIndex=0;
-    boolean missedFrame = false; // bool to quickly see if we have missed a frame before
-    int timeIndex = 0; // start index at 0, used to iterate through time[]
-    float x1, y1, x2, y2;
     //*** PROCESSING VARIABLES DEFINITIONS END ***//
     Toast toaster;
 
@@ -180,21 +181,18 @@ public class DetectActivity extends Activity implements CvCameraViewListener2 {
         return false;
     }
 
-
     public Void reset() {
         timeIndex = 0;
         images.clear();
-        missedFrame = false;
         missedFrameIndex=0;
         return null;
     }
 
     public Void processIntent() {
-        //TODO: clear toasts
+        //toaster.setText(MAXBUFFSIZE + " SAMPLES COLLECTED. ATTEMPTING TO PROCESS, PLEASE WAIT.");
+        //toaster.show();
         Intent myIntent = new Intent(DetectActivity.this, Results.class);
         myIntent.putExtra("times", times);
-        myIntent.putExtra("timeIndex", timeIndex);
-        myIntent.putExtra("missedFrame", missedFrame);
         myIntent.putExtra("missedFrames", missedFrames);
         myIntent.putExtra("missedFrameIndex", missedFrameIndex);
         DetectActivity.this.startActivity(myIntent);
@@ -213,20 +211,9 @@ public class DetectActivity extends Activity implements CvCameraViewListener2 {
 
         // if touch screen draw rectangle on frame which will be the ROI, process, and store timestamp
         if (screenTap && timeIndex < MAXBUFFSIZE) {
-            //TODO: change timestamp recording to only record differences; use two values for first stamp and next stamp - store differences. Why recalculate?
-            times[timeIndex] = System.nanoTime() / 1000000;
-            //SystemClock.elapsedRealtimeNanos()/1000000; //get the time when we capture a frame; apparently elapsedRealtimeNano requires >= API 17
+            times[timeIndex] = SystemClock.elapsedRealtimeNanos()/1000000; //get the time when we capture a frame; apparently elapsedRealtimeNano requires >= API 17
 
             Imgproc.rectangle(myImage, rectPoint1, rectPoint2, redOutline, 5); // draw red ROI rectangle
-
-            //TODO: check to see if enough time has elapsed before capturing frame; if not enough skip
-          /*  if (timeIndex > 1) {
-                diff = (times[timeIndex] - times[timeIndex - 1]);
-                if (diff < 50) {
-                    return myImage;
-                }
-                diff = 0;
-            }*/
 
             //get just the ROI, then grayscale and threshold so more memory efficient (need to store many matrices into arrayList)
             croppedImg = myImage.submat(subRectangle);
@@ -234,19 +221,20 @@ public class DetectActivity extends Activity implements CvCameraViewListener2 {
             Imgproc.threshold(croppedImg, croppedImg, THRESHOLD, MAX, Imgproc.THRESH_BINARY);
             images.add(croppedImg.clone()); // may need to clone to actually get the image
 
-
             if (timeIndex > 1) { //only take the difference if we have a time already
                 diff = ((times[timeIndex] - times[timeIndex - 1]));
-                Log.i(TAG, "diff = " + diff + ", frames = " + images.size() + ", missedFrames = " + missedFrameIndex);
                 if (diff >= MAXSIGNALTIME && missedFrameIndex < MISSEDFRAMESIZE) { // check if we missed a frame based on delay; check if enough space in missedFrames
-                    missedFrame = true;
                     missedFrames[missedFrameIndex] = timeIndex;
                     missedFrameIndex++;
                 }
+                else if (missedFrameIndex > MISSEDFRAMESIZE) {
+                    toaster.setText("WARNING YOUR PHONE MAY NOT BE CAPABLE OF SAMPLING QUICKLY ENOUGH. OVER" + MISSEDFRAMESIZE + "FRAMES HAVE BEEN MISSED");
+                    toaster.show();
+                }
             }
             timeIndex++; // very last thing we should do
-
         }
         return myImage;
     }
+
 }
