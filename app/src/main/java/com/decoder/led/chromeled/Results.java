@@ -29,9 +29,6 @@ import org.w3c.dom.Text;
 
 public class Results extends AppCompatActivity {
     private static final String TAG = "ResultsPage";
-    String out;
-    boolean startFound = false;
-    boolean endFound = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +37,7 @@ public class Results extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        HashMap<String, String> key = new HashMap<String, String>();
+        /*HashMap<String, String> key = new HashMap<String, String>();
         key.put("0000", "0");
         key.put("0001", "1");
         key.put("0010", "2");
@@ -56,7 +53,7 @@ public class Results extends AppCompatActivity {
         key.put("1100", "C");
         key.put("1101", "D");
         key.put("1110", "E");
-        key.put("1111", "F");
+        key.put("1111", "F");*/
 
         //bundle setup, refer between results activity and tutorial1activity
         Bundle extras = getIntent().getExtras();
@@ -83,31 +80,20 @@ public class Results extends AppCompatActivity {
         List<String> parseResults = msgParse(samplingResults);
 
         Log.i(TAG, "parseResults output");
-        String outString = printOut(parseResults);
+        //String outString = printOut(parseResults);
 
 
         msgFix(parseResults);
         Log.i(TAG, "msgFix output");
-        outString = printOut(parseResults);
+        //outString = printOut(parseResults);
 
         List<String> decodeResults = msgDecode(parseResults);
 
 
         Log.i(TAG, "decodeResults output");
         //outString = "Sampled Data" + "\n\n" + samplingResults + "\n\n" + "YOUR MESSAGE: " + printOut(decodeResults);
-        outString = "YOUR MESSAGE WAS: " + printOut(decodeResults);
+        String outString = "YOUR MESSAGE WAS: " + printOut(decodeResults);
         tv.setText(outString);
-        //String decodeResults = msgDecode(samplingResults);
-
-        //printOut(decodeResults);
-
-        //out = msgDecode(samplingResults, key);
-        //Toast.makeText(getApplicationContext(), "startFound: " +startFound + ", endFound: "+ endFound, Toast.LENGTH_LONG).show();
-        //tv.setText("Raw Data" + "\n\n" + processResults + "\n\n" + "Sampled Data" + "\n\n" + samplingResults + "\n\n" + "Decoded Data" + "\n\n" + decodeResults);
-        //tv.setText("Decoded Data" + "\n\n" + decodeResults);
-
-        //tv.setText("Sampled Data" + "\n\n" + samplingResults);
-
     }
 
 
