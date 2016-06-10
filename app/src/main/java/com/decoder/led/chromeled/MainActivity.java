@@ -198,8 +198,12 @@ public class MainActivity extends AppCompatActivity
                     .replace(R.id.content_main, new ContactUsFragment())
                     .commit();
             textView.setVisibility(View.GONE);
+        } else if (id == R.id.nav_message_encodings) {
+            fragmentMangager.beginTransaction()
+                    .replace(R.id.content_main, new MessageEncodingsFragment())
+                    .commit();
+            textView.setVisibility(View.GONE);
         }
-
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

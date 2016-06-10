@@ -18,6 +18,10 @@
             android:id="@+id/nav_contact_us"
             android:icon="@drawable/contact_us"
             android:title="Contact Us" />
+        <item
+            android:id="@+id/nav_message_encodings"
+            android:icon="@drawable/encodings"
+            android:title="Encodings" />
     </group>
 
 </menu>
