@@ -16,27 +16,19 @@
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Save"
+        android:text="Save to error log"
         android:id="@+id/save_button"
-        android:layout_alignTop="@+id/Debug_textView"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:onClick="saveText" />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Data info"
-        android:id="@+id/bugInfo"
-        android:layout_below="@+id/Debug_textView"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="15dp" />
+        android:onClick="saveText"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="109dp" />
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Debug Data"
-        android:id="@+id/Debug_textView"
+        android:text="Decoded LED Signal"
+        android:id="@+id/title_textView"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
@@ -44,60 +36,14 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/bugInfo"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="38dp">
+        android:layout_marginTop="38dp"
+        android:layout_below="@+id/title_textView"
+        android:id="@+id/scrollView">
 
 
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/bugInfo"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/textView_activity_results"
-                android:text="Raw Data"
-                android:layout_below="@+id/bugInfo"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Output Msg"
-                android:id="@+id/extratextView"
-                android:layout_below="@+id/textView_activity_results"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_marginTop="36dp" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Parsed Binary"
-                android:id="@+id/parsed_bin_textView"
-                android:layout_below="@+id/extratextView"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_marginTop="34dp" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Time Stamps"
-                android:id="@+id/timeStampTV"
-                android:layout_below="@+id/parsed_bin_textView"
-                android:layout_centerVertical="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_marginTop="32dp"/>
-
-        </RelativeLayout>  </ScrollView>
-
-
-
+    </ScrollView>
 
 
 </RelativeLayout>

@@ -29,12 +29,12 @@
         android:textSize="20dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:id="@+id/textView2"
-        android:layout_above="@+id/textView"
-        android:layout_alignLeft="@+id/textView"
-        android:layout_alignStart="@+id/textView" />
+        android:layout_above="@+id/message_textView"
+        android:layout_alignLeft="@+id/message_textView"
+        android:layout_alignStart="@+id/message_textView" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/message_textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="chrome.diagnostics@gmail.com"

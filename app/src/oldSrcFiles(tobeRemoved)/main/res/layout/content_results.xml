@@ -27,6 +27,6 @@
         android:layout_height="wrap_content"
         android:id="@+id/textView_activity_results"
         android:layout_marginTop="44dp"
-        android:layout_below="@+id/textView"
+        android:layout_below="@+id/message_textView"
         android:layout_centerHorizontal="true" />
 </RelativeLayout>

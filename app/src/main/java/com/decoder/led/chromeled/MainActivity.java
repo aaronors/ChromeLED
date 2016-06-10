@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -19,13 +20,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
+import java.io.PrintWriter;
 
 
 public class MainActivity extends AppCompatActivity
@@ -85,7 +87,44 @@ public class MainActivity extends AppCompatActivity
         textView.setText(stringBuffer.toString());//end of error message display
         */
 
+        createEncodings();
 
+    }
+
+    public void createEncodings() {
+        if(isExternalStorageWritable() == true){
+            File root = android.os.Environment.getExternalStorageDirectory();
+            // See http://stackoverflow.com/questions/3551821/android-write-to-sd-card-folder
+            // Find the root of the external storage.
+            // See http://developer.android.com/guide/topics/data/data-  storage.html#filesExternal
+
+            File dir = new File (root.getAbsolutePath() + "/ChromeLED");
+            dir.mkdirs();
+            File file = new File(dir, "Encodings.txt");
+
+            try {
+                FileOutputStream f = new FileOutputStream(file);
+                PrintWriter pw = new PrintWriter(f);
+                pw.println("Hello World");
+                pw.flush();
+                pw.close();
+                f.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else {
+            //TODO:output failed to load error
+        }
+    }
+
+    public boolean isExternalStorageWritable() {
+        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+            return true;
+        }
+        return false;
     }
 
     //clear savefile
@@ -133,8 +172,6 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
     }
-
-
 
     @Override
     public void onBackPressed() {
