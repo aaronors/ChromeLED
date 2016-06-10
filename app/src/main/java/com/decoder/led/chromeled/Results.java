@@ -1,5 +1,6 @@
 package com.decoder.led.chromeled;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import java.io.File;
@@ -55,52 +56,21 @@ public class Results extends AppCompatActivity {
             tv.setText("We are sorry. We were unable to detect your LED signal. Please ensure that the camera and ROI are positioned as correctly as possible, and try again.");
     }
 
-    public void saveText(View view) {
-        if(isExternalStorageWritable() == true && saved == false){
-            tv.setText("Saving to error log. Please wait.");
-            writeToSDFile(outString);
+    public void saveText(View view){
+        if (saved)
+            return;
+        String filename = "savefile";
+        FileOutputStream outputStream;
+        String internalString = outString + "\n";
+        try{
+            outputStream = openFileOutput(filename, Context.MODE_APPEND);
+            outputStream.write(internalString.getBytes());
+            outputStream.close();
+            tv.setText("Thank you. Your error has been saved to the error log. You can view the changes from the error log fragment of the main activity page.");
             saved = true;
-        }
-        else
-            tv.setText("We are sorry. Your external storage was not writable. Please check the permissions for your device and try again.");
-    }
-
-    public boolean isExternalStorageWritable() {
-        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-            return true;
-        }
-        return false;
-    }
-
-    public void writeToSDFile(String toWrite){
-        // Find the root of the external storage.
-        // See http://developer.android.com/guide/topics/data/data-  storage.html#filesExternal
-
-        File root = android.os.Environment.getExternalStorageDirectory();
-        // See http://stackoverflow.com/questions/3551821/android-write-to-sd-card-folder
-
-        //check if directory already exists, if not create the directory
-        File dir = new File (root.getAbsolutePath() + "/ChromeLED");
-        if (!dir.exists()) {
-            dir.mkdirs();
-        }
-        File file = new File(dir, "ErrorLog.txt");
-
-        try {
-            FileOutputStream f = new FileOutputStream(file);
-            PrintWriter pw = new PrintWriter(f);
-            pw.println(toWrite);
-            //pw.println("Hello");
-            pw.flush();
-            pw.close();
-            f.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        String myString = "Thank you. Your error was saved to " + dir + file;
-        tv.setText(myString);
     }
 
     void msgFix(List<String> inputList){
